@@ -10,11 +10,9 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export async function loader({ request,params}: LoaderFunctionArgs){
+export async function loader({ }: LoaderFunctionArgs){
   try {
-    console.log(params,'params??', process.env.DB_HOST)
     const [rooms] = await pool.execute('SELECT * FROM rooms');
-
     return rooms;
   } catch (error:any) {
     return 'Error';
