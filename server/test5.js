@@ -36,12 +36,16 @@ function maxIndependentSet(n, edges) {
 function countBits(x) {
   return x.toString(2).split('1').length - 1;
 }
-const n = 4;
-// 0 - 1 - 2 - 3
+const n = 7;
+
 const edges = [
   [0, 1],
   [1, 2],
-  [2, 3],
+  [1, 3],
+  [3, 4],
+  [4, 5],
+  [3, 6],
 ];
-
+// 001011
+// 001001
 console.log(maxIndependentSet(n, edges))
