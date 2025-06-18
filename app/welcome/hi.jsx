@@ -169,7 +169,7 @@ function SetLayer({ objectRef, layer, setSelection }) {
 
 export function Hi() {
   const [selection, setSelection] = useState([])
-  console.log(selection)
+  // console.log(selection)
   return (
     <Canvas
     linear

@@ -1,10 +1,11 @@
+
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
 import React, { useRef, useState, useEffect, useMemo } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { Edges, OrbitControls, PerspectiveCamera, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { EffectComposer,Outline,Selection, Select } from "@react-three/postprocessing";
+import { EffectComposer,Outline, Bloom } from "@react-three/postprocessing";
 function Model2({ onPartClick }:any) {
   const { scene, nodes } = useGLTF("/myFirstBlender.glb"); // 모델 불러오기
 
@@ -41,14 +42,16 @@ function Model({ onPartClick, selected  }:any) {
       {meshes.map((mesh, idx) => {
         const position = mesh.getWorldPosition(new THREE.Vector3());
         const scale = mesh.getWorldScale(new THREE.Vector3());
+        // let {x,y,z} = scale
+        // let s =(selected?.uuid === mesh.uuid)?new THREE.Vector3(x*1.1,y*1.1,z*1.1):scale
 
         // ✅ getWorldQuaternion → THREE.Euler 회전값으로 변환
         const quaternion = mesh.getWorldQuaternion(new THREE.Quaternion());
         const rotation = new THREE.Euler().setFromQuaternion(quaternion);
 
         return (
-          <Select key={idx} enabled={selected?.uuid === mesh.uuid}>
-            <mesh
+            <mesh key={idx}
+              name={mesh.name}
               geometry={mesh.geometry}
               position={position}
               rotation={rotation}
@@ -56,7 +59,7 @@ function Model({ onPartClick, selected  }:any) {
               material={mesh.material.clone()}
               onClick={(e) => {
                 e.stopPropagation();
-                onPartClick(mesh);
+                onPartClick(e.object);
               }}
             >
             {/* {selected?.uuid === mesh.uuid && (
@@ -66,12 +69,10 @@ function Model({ onPartClick, selected  }:any) {
               />
             )} */}
           </mesh>
-        </Select>
         )})}
     </>
   );
 }
-
 
 function Scene({setPopupInfo}:any) {
   const cameraRef = useRef<any>(null);
@@ -79,7 +80,7 @@ function Scene({setPopupInfo}:any) {
   const [distance, setDistance] = useState(8); // 카메라 타겟 거리
   const [selected, setSelected] = useState<any>(null); // 선택된 mesh
 
-   // 마우스 이동 → 회전 각도 반영
+  //  마우스 이동 → 회전 각도 반영
    useEffect(() => {
     const handleMouseMove = (e:any) => {
       const { innerWidth, innerHeight } = window;
@@ -115,7 +116,6 @@ function Scene({setPopupInfo}:any) {
     const x = distance * Math.sin(rotation.theta+initialTheta) * Math.cos(rotation.phi+initialPhi);
     const y = distance * Math.sin(rotation.phi+initialPhi);
     const z = distance * Math.cos(rotation.theta+initialTheta) * Math.cos(rotation.phi+initialPhi);
-    const d = distance
     cameraRef.current.position.set(x, y, z);
     cameraRef.current.lookAt(0, 0, 0);
   });
@@ -125,7 +125,7 @@ function Scene({setPopupInfo}:any) {
       <PerspectiveCamera ref={cameraRef} makeDefault fov={80} />
       <ambientLight />
       <directionalLight position={[5, 5, 5]} />
-      <Selection>
+
         <Model onPartClick={(object:any)=>{
           console.log('??',object)
           setPopupInfo({
@@ -135,17 +135,19 @@ function Scene({setPopupInfo}:any) {
           setSelected(object)
         }} 
         selected={selected}/>
+
         <EffectComposer autoClear={false}>
           <Outline
-            selection={selected?[selected]:[]}
+            selection={selected?selected:[]}
             edgeStrength={10}
-            // visibleEdgeColor={new THREE.Color("orange").getHex()} // ✅ number로 변환
-            visibleEdgeColor={0xffffff} // ✅ number로 변환
+            visibleEdgeColor={new THREE.Color("orange").getHex()} // ✅ number로 변환
             hiddenEdgeColor={0x000000}
             blur={false}
           />
+          <Bloom 
+          intensity={0.8} luminanceThreshold={0.2} luminanceSmoothing={0.8}/>
         </EffectComposer>
-      </Selection>
+
       <OrbitControls />
     </>
   );
