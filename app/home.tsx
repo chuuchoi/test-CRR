@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import type { Route } from "./+types/home";
 import { pool } from "./db";
 import { Welcome } from "./welcome/welcome";
+import { Hi } from "./welcome/hi";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -25,5 +26,6 @@ export default function Home({loaderData}:Route.ComponentProps) {
   <Welcome />
   {'hi'}
   {JSON.stringify(loaderData)}
+  <Hi />
   </>;
 }
