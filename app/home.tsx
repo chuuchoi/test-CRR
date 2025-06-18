@@ -21,7 +21,8 @@ export async function loader({ }: LoaderFunctionArgs){
 
 export default function Home({loaderData}:Route.ComponentProps) {
   console.log('ASGASGSG???',import.meta.env.VITE_API_BASE_URL)
-  return <><Welcome />
+  return <>
+  <Welcome />
   {'hi'}
   {JSON.stringify(loaderData)}
   </>;

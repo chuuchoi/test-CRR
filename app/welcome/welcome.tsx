@@ -1,10 +1,182 @@
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
+import React, { useRef, useState, useEffect, useMemo } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Edges, OrbitControls, PerspectiveCamera, useGLTF } from "@react-three/drei";
+import * as THREE from "three";
+import { EffectComposer,Outline,Selection, Select } from "@react-three/postprocessing";
+function Model2({ onPartClick }:any) {
+  const { scene, nodes } = useGLTF("/myFirstBlender.glb"); // 모델 불러오기
+
+  // 예시: 이름이 "ClickablePart"인 부분을 클릭 가능하게 처리
+  return (
+    <primitive
+      object={scene}
+      onClick={(e:any) => {
+        e.stopPropagation();
+        console.log(e.object)
+        // if (e.object.name === "ClickablePart") {
+          onPartClick(e.object);
+        // }
+      }}
+    />
+  );
+}
+
+
+function Model({ onPartClick, selected  }:any) {
+  const { scene, nodes } = useGLTF("/myFirstBlender.glb"); // 모델 불러오기
+
+  // scene 내의 모든 Mesh만 추출 (중첩 포함)
+  const meshes = useMemo(() => {
+    const result: any[] = [];
+    scene.traverse((child:any) => {
+      if (child.isMesh) result.push(child);
+    });
+    return result;
+  }, [scene]);
+
+  return (
+    <>
+      {meshes.map((mesh, idx) => {
+        const position = mesh.getWorldPosition(new THREE.Vector3());
+        const scale = mesh.getWorldScale(new THREE.Vector3());
+
+        // ✅ getWorldQuaternion → THREE.Euler 회전값으로 변환
+        const quaternion = mesh.getWorldQuaternion(new THREE.Quaternion());
+        const rotation = new THREE.Euler().setFromQuaternion(quaternion);
+
+        return (
+          <Select key={idx} enabled={selected?.uuid === mesh.uuid}>
+            <mesh
+              geometry={mesh.geometry}
+              position={position}
+              rotation={rotation}
+              scale={scale}
+              material={mesh.material.clone()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onPartClick(mesh);
+              }}
+            >
+            {/* {selected?.uuid === mesh.uuid && (
+              // 🔎 Edges는 직접 <mesh> 안에 넣어야 제대로 적용됩니다.
+              <Edges scale={1} threshold={1} color="#ff0000" lineWidth={8}
+              
+              />
+            )} */}
+          </mesh>
+        </Select>
+        )})}
+    </>
+  );
+}
+
+
+function Scene({setPopupInfo}:any) {
+  const cameraRef = useRef<any>(null);
+  const [rotation, setRotation] = useState({ phi: 0, theta: 0 }); // 각도 (라디안)
+  const [distance, setDistance] = useState(8); // 카메라 타겟 거리
+  const [selected, setSelected] = useState<any>(null); // 선택된 mesh
+
+   // 마우스 이동 → 회전 각도 반영
+   useEffect(() => {
+    const handleMouseMove = (e:any) => {
+      const { innerWidth, innerHeight } = window;
+      const x = ((e.clientX / innerWidth) - 0.5) * 2; // -1 ~ 1
+      const y = ((e.clientY / innerHeight) - 0.5) * 2;
+
+      const maxAngle = (10 * Math.PI) / 180; // ±10도 → 라디안
+      setRotation({
+        phi: y * maxAngle,
+        theta: x * maxAngle,
+      });
+    };
+
+    const handleWheel = (e:any) => {
+      setDistance((prev) => {
+        const newDist = prev + e.deltaY * 0.01;
+        return Math.min(10, Math.max(6, newDist)); // 6 ~ 10 제한
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("wheel", handleWheel);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
+  // 카메라 위치 갱신
+  useFrame(() => {
+    const initialTheta = (45 * Math.PI) / 180;
+    const initialPhi = (45 * Math.PI) / 180;
+    const x = distance * Math.sin(rotation.theta+initialTheta) * Math.cos(rotation.phi+initialPhi);
+    const y = distance * Math.sin(rotation.phi+initialPhi);
+    const z = distance * Math.cos(rotation.theta+initialTheta) * Math.cos(rotation.phi+initialPhi);
+    const d = distance
+    cameraRef.current.position.set(x, y, z);
+    cameraRef.current.lookAt(0, 0, 0);
+  });
+
+  return (
+    <>
+      <PerspectiveCamera ref={cameraRef} makeDefault fov={80} />
+      <ambientLight />
+      <directionalLight position={[5, 5, 5]} />
+      <Selection>
+        <Model onPartClick={(object:any)=>{
+          console.log('??',object)
+          setPopupInfo({
+            name: object.name,
+            position: object.position,
+          });
+          setSelected(object)
+        }} 
+        selected={selected}/>
+        <EffectComposer autoClear={false}>
+          <Outline
+            selection={selected?[selected]:[]}
+            edgeStrength={10}
+            // visibleEdgeColor={new THREE.Color("orange").getHex()} // ✅ number로 변환
+            visibleEdgeColor={0xffffff} // ✅ number로 변환
+            hiddenEdgeColor={0x000000}
+            blur={false}
+          />
+        </EffectComposer>
+      </Selection>
+      <OrbitControls />
+    </>
+  );
+}
+
 
 export function Welcome() {
+  const [popupInfo, setPopupInfo] = useState<any>({});
+
   return (
     <main className="flex items-center justify-center pt-16 pb-4">
+      {popupInfo.name && (
+        <div
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 100,
+            padding: 10,
+            background: "white",
+            border: "1px solid #ccc",
+          }}
+        >
+          <p>🔍 클릭된 부분: {popupInfo.name}</p>
+          <p>위치: {popupInfo.position}</p>
+          <button onClick={() => setPopupInfo({})}>닫기</button>
+        </div>
+      )}
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
+      <Canvas dpr={[1, 2]} gl={{ antialias: true }} style={{background:'black',width:'800px',height:'800px',border:'1px solid'}}>
+        <Scene setPopupInfo={setPopupInfo}/>
+      </Canvas>
         <header className="flex flex-col items-center gap-9">
           <div className="w-[500px] max-w-[100vw] p-4">
             <img

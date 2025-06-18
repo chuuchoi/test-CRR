@@ -72,6 +72,7 @@ const edges = [
   [3, 6],
 ];
 
-const destinations =[0, 1, 2, 3, 4, 5, 6];
+const destinations =[0, 4, 2];
+// const destinations =[0, 1, 2, 3, 4, 5, 6];
 
 console.log(minDistMST(n, edges, destinations)); // ✅ 결과: 3
