@@ -13,4 +13,4 @@ export declare const Hi: React.ForwardRefExoticComponent<Partial<{
 }> & Partial<{
   selection: Object3D | Object3D[] | ObjectRef | ObjectRef[];
   selectionLayer: number;
-}> & React.RefAttributes<OutlineEffect>>;
+}> >;

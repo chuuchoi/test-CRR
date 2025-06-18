@@ -1,15 +1,17 @@
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { OrbitControls } from "@react-three/drei";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass";
+
 
 const BLOOM_LAYER = 1;
 const ENTIRE_SCENE = 0;
 
-function MySelectiveBloom() {
+function MySelectiveBloom({selection}) {
   const { gl, scene, camera, size } = useThree();
   const composer = useRef();
   const bloomComposer = useRef();
@@ -34,12 +36,28 @@ function MySelectiveBloom() {
       30
     );
     bloomPass.threshold = 0.01;
-    bloomPass.strength = 5; // bloom intensity
+    bloomPass.strength = 0.4; // bloom intensity
     bloomPass.radius = 1;
 
     bloomComposer.current.addPass(renderScene);
     bloomComposer.current.addPass(bloomPass);
 
+    const outlinePass = new OutlinePass(
+      new THREE.Vector2(size.width, size.height),
+      scene,
+      camera,
+      selection // selected objects
+    );
+    // ✅ outline always on top
+    // outlinePass.overlayMaterial.depthTest = false;
+    // outlinePass.overlayMaterial.depthWrite = false;
+    // outlinePass.overlayMaterial.transparent = true;
+    // ✅ outline 옵션 설정
+    outlinePass.edgeStrength = 40;
+    outlinePass.edgeThickness = 1;
+    outlinePass.visibleEdgeColor.set("#ffffff");
+    // ✅ composer에 추가
+    bloomComposer.current.addPass(outlinePass);
     camera.layers.enable(BLOOM_LAYER); // 카메라가 bloom 레이어도 보도록 설정
   }, [gl, scene, camera, size]);
 
@@ -83,26 +101,26 @@ function MySelectiveBloom() {
 
   // 2. bloom 아닌 애들 어둡게
   scene.traverse(darkenNonBloomed);
-  bloomComposer.current?.render();  // → bloom 결과를 framebuffer에 렌더링
+  // bloomComposer.current?.render();  // → bloom 결과를 framebuffer에 렌더링
 
   // 3. 재질 복구
   scene.traverse(restoreMaterial);
   camera.layers.mask = previousLayer;
 
   // 4. 메인 씬은 그냥 render로 gl에 합성
-  gl.autoClear = false;
-  gl.clearDepth(); // 깊이값 리셋
+  // gl.autoClear = false;
+  // gl.clearDepth(); // 깊이값 리셋
   //✅ 핵심은 gl.clearDepth()와 autoClear = false를 써서 두 번째 render가 첫 번째 bloom 결과를 덮어쓰지 않도록 하는 것입니다.
   // composer.current?.render();
   gl.render(scene, camera); // ✅ 이게 핵심
+  bloomComposer.current?.render()
   }, 1);
 
   return null;
 }
 
-function Scene() {
+function Scene({setSelection}) {
   const redRef = useRef();
-
   return (
     <>
       <ambientLight intensity={1} />
@@ -131,15 +149,16 @@ function Scene() {
       </mesh>
 
       {/* Bloom 대상에만 layer 설정 */}
-      <SetLayer objectRef={redRef} layer={BLOOM_LAYER} />
+      <SetLayer objectRef={redRef} layer={BLOOM_LAYER} setSelection={setSelection} />
     </>
   );
 }
 
-function SetLayer({ objectRef, layer }) {
+function SetLayer({ objectRef, layer, setSelection }) {
   useEffect(() => {
     if (objectRef.current) {
       console.log(objectRef.current)
+      setSelection([objectRef.current])
       objectRef.current.layers.set(layer);
     }
   }, [objectRef, layer]);
@@ -149,6 +168,8 @@ function SetLayer({ objectRef, layer }) {
 
 
 export function Hi() {
+  const [selection, setSelection] = useState([])
+  console.log(selection)
   return (
     <Canvas
     linear
@@ -156,8 +177,8 @@ export function Hi() {
       gl={{ antialias: true }}
       style={{ background: "black", width: "800px", height: "800px", border: "1px solid" }}
     >
-      <Scene />
-      <MySelectiveBloom />
+      <Scene setSelection={setSelection}/>
+      <MySelectiveBloom selection={selection}/>
       <OrbitControls />
     </Canvas>
   );
