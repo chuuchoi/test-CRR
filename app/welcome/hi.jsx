@@ -2,10 +2,7 @@ import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import { OrbitControls } from "@react-three/drei";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
-import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass";
+import { EffectComposer, UnrealBloomPass, RenderPass, OutlinePass } from "three-stdlib";
 
 
 const BLOOM_LAYER = 1;
