@@ -1,1 +1,0 @@
-import{w as o,o as t,O as a}from"./chunk-NL6KNZEE-DcCgqZzM.js";const e=o(function(){return console.log("auth layout active"),t.jsxs("div",{children:[t.jsx("h2",{children:"Auth Layout"}),t.jsx(a,{})]})});export{e as default};
