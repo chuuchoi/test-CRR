@@ -3,6 +3,8 @@ import type { Route } from "./+types/home";
 import { pool } from "./db";
 import { Welcome } from "./welcome/welcome";
 import { Hi } from "./welcome/hi";
+import { Example } from "./welcome/window";
+
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -27,5 +29,6 @@ export default function Home({loaderData}:Route.ComponentProps) {
   {'hi'}
   {JSON.stringify(loaderData)}
   <Hi />
+  <Example />
   </>;
 }

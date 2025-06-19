@@ -175,7 +175,7 @@ export function Hi() {
     linear
       dpr={[1, 2]}
       gl={{ antialias: true }}
-      style={{ background: "black", width: "800px", height: "800px", border: "1px solid" }}
+      style={{ display:'inline-block', background: "black", width: "800px", height: "800px", border: "1px solid" }}
     >
       <Scene setSelection={setSelection}/>
       <MySelectiveBloom selection={selection}/>
