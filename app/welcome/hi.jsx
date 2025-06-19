@@ -168,15 +168,17 @@ export function Hi() {
   const [selection, setSelection] = useState([])
   // console.log(selection)
   return (
+    <div className="w-72 h-72 md:w-160 md:h-160 m-auto">
     <Canvas
     linear
       dpr={[1, 2]}
       gl={{ antialias: true }}
-      style={{ display:'inline-block', background: "black", width: "800px", height: "800px", border: "1px solid" }}
+      style={{ background: "black", border: "1px solid" }}
     >
       <Scene setSelection={setSelection}/>
       <MySelectiveBloom selection={selection}/>
       <OrbitControls />
     </Canvas>
+    </div>
   );
 }

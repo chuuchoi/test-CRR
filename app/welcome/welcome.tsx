@@ -176,9 +176,11 @@ export function Welcome() {
         </div>
       )}
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
-      <Canvas dpr={[1, 2]} gl={{ antialias: true }} style={{background:'black',width:'800px',height:'800px',border:'1px solid'}}>
-        <Scene setPopupInfo={setPopupInfo}/>
-      </Canvas>
+        <div className="w-72 h-72 md:w-160 md:h-160">
+        <Canvas  dpr={[1, 2]} gl={{ antialias: true }} style={{background:'black',border:'1px solid'}}>
+          <Scene setPopupInfo={setPopupInfo}/>
+        </Canvas>
+        </div>
         <header className="flex flex-col items-center gap-9">
           <div className="w-[500px] max-w-[100vw] p-4">
             <img

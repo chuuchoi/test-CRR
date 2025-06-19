@@ -11,8 +11,8 @@ const Row = (props:any) => (
 );
 
 export const Example = () => (
-  <List style={{float:"right", border:'1px solid'}}
-    className="List"
+  <List style={{border:'1px solid'}}
+    className="mx-auto my-16"
     height={150}
     itemCount={1000}
     itemSize={35}
