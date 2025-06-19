@@ -7,7 +7,7 @@ import { Edges, OrbitControls, PerspectiveCamera, useGLTF } from "@react-three/d
 import * as THREE from "three";
 import { EffectComposer,Outline, Bloom } from "@react-three/postprocessing";
 function Model2({ onPartClick }:any) {
-  const { scene, nodes } = useGLTF("/myFirstBlender.glb"); // 모델 불러오기
+  const { scene, nodes } = useGLTF(`${import.meta.env.BASE_URL}myFirstBlender.glb`); // 모델 불러오기
 
   // 예시: 이름이 "ClickablePart"인 부분을 클릭 가능하게 처리
   return (
@@ -26,7 +26,7 @@ function Model2({ onPartClick }:any) {
 
 
 function Model({ onPartClick, selected  }:any) {
-  const { scene, nodes } = useGLTF("/myFirstBlender.glb"); // 모델 불러오기
+  const { scene, nodes } = useGLTF(`${import.meta.env.BASE_URL}myFirstBlender.glb`); // 모델 불러오기
 
   // scene 내의 모든 Mesh만 추출 (중첩 포함)
   const meshes = useMemo(() => {
