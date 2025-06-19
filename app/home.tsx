@@ -13,21 +13,22 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export async function loader({ }: LoaderFunctionArgs){
-  try {
-    const [rooms] = await pool.execute('SELECT * FROM rooms');
-    return rooms;
-  } catch (error:any) {
-    return 'Error';
-  }
-}
+// export async function loader({ }: LoaderFunctionArgs){
+//   try {
+//     const [rooms] = await pool.execute('SELECT * FROM rooms');
+//     return rooms;
+//   } catch (error:any) {
+//     return 'Error';
+//   }
+// }
 
-export default function Home({loaderData}:Route.ComponentProps) {
+// export default function Home({loaderData}:Route.ComponentProps) {
+export default function Home() {
   console.log('ASGASGSG???',import.meta.env.VITE_API_BASE_URL)
   return <>
   <Welcome />
   {'hi'}
-  {JSON.stringify(loaderData)}
+  {/* {JSON.stringify(loaderData)} */}
   <Hi />
   <Example />
   </>;
