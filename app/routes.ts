@@ -18,7 +18,16 @@ export default [
 
   ...prefix("concerts", [
     index("./concerts/home.tsx"),
+    route("d", "./concerts/d.tsx"),
     route(":city", "./concerts/city.tsx"),
     route("trending", "./concerts/trending.tsx"),
   ]),
+  
+  ...prefix("figma-test", [
+    index("./figma-test/index.tsx"),
+    route("1", "./figma-test/MobileLogin.tsx"),
+    route("2", "./figma-test/Products.tsx"),
+  ]),
+
+  route("*", "not-found.tsx")
 ] satisfies RouteConfig;

@@ -8,10 +8,10 @@ import { EffectComposer, UnrealBloomPass, RenderPass, OutlinePass } from "three-
 const BLOOM_LAYER = 1;
 const ENTIRE_SCENE = 0;
 
-function MySelectiveBloom({selection}) {
+function MySelectiveBloom({selection}:any) {
   const { gl, scene, camera, size } = useThree();
-  const composer = useRef();
-  const bloomComposer = useRef();
+  const composer = useRef<any>(null);
+  const bloomComposer = useRef<any>(null);
 
   const darkMaterial = new THREE.MeshBasicMaterial({ color: "black" });
   const materials = new Map();
@@ -54,11 +54,11 @@ function MySelectiveBloom({selection}) {
     outlinePass.edgeThickness = 1;
     outlinePass.visibleEdgeColor.set("#ffffff");
     // ✅ composer에 추가
-    bloomComposer.current.addPass(outlinePass);
+    bloomComposer.current?.addPass(outlinePass);
     camera.layers.enable(BLOOM_LAYER); // 카메라가 bloom 레이어도 보도록 설정
   }, [gl, scene, camera, size]);
 
-  const darkenNonBloomed = (obj) => {
+  const darkenNonBloomed = (obj:any) => {
     const bloomLayer = new THREE.Layers();
     bloomLayer.set(BLOOM_LAYER);
     if(
@@ -73,7 +73,7 @@ function MySelectiveBloom({selection}) {
       }
   };
   
-  const restoreMaterial = (obj) => {
+  const restoreMaterial = (obj:any) => {
     if (obj.isMesh && materials.has(obj.uuid)) {
       obj.material = materials.get(obj.uuid);
       materials.delete(obj.uuid);
@@ -116,8 +116,8 @@ function MySelectiveBloom({selection}) {
   return null;
 }
 
-function Scene({setSelection}) {
-  const redRef = useRef();
+function Scene({setSelection}:any) {
+  const redRef = useRef(null);
   return (
     <>
       <ambientLight intensity={1} />
@@ -151,7 +151,7 @@ function Scene({setSelection}) {
   );
 }
 
-function SetLayer({ objectRef, layer, setSelection }) {
+function SetLayer({ objectRef, layer, setSelection }:any) {
   useEffect(() => {
     if (objectRef.current) {
       console.log(objectRef.current)
@@ -164,21 +164,21 @@ function SetLayer({ objectRef, layer, setSelection }) {
 }
 
 
-export function Hi() {
+export function Hi({num}:{num:number}) {
   const [selection, setSelection] = useState([])
   // console.log(selection)
-  return (
+  return (<><h1>H1</h1>
     <div className="w-72 h-72 md:w-160 md:h-160 m-auto">
     <Canvas
     linear
-      dpr={[1, 2]}
-      gl={{ antialias: true }}
-      style={{ background: "black", border: "1px solid" }}
+    dpr={[1, 2]}
+    gl={{ antialias: true }}
+    style={{ background: "black", border: "1px solid" }}
     >
       <Scene setSelection={setSelection}/>
       <MySelectiveBloom selection={selection}/>
       <OrbitControls />
     </Canvas>
     </div>
-  );
+  </>);
 }

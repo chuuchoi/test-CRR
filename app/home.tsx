@@ -28,7 +28,7 @@ export default function Home({loaderData}:Route.ComponentProps) {
   {'hi'}
   <Welcome />
   {/* {JSON.stringify(loaderData)} */}
-  <Hi />
+  <Hi num={4}  />
   <Example />
   </>;
 }

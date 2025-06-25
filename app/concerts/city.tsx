@@ -1,5 +1,6 @@
-export default function About(){
+export default function About({params}:any){
+
   return(
-    <>ct</>
+    <>params:{JSON.stringify(params)}</>
   )
 }
