@@ -27,6 +27,7 @@ export default [
     index("./figma-test/index.tsx"),
     route("1", "./figma-test/MobileLogin.tsx"),
     route("2", "./figma-test/Products.tsx"),
+    // route("3", "./figma-test/Register.tsx"),
   ]),
 
   route("*", "not-found.tsx")

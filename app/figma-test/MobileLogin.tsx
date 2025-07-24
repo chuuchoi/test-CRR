@@ -1,3 +1,6 @@
+//@ts-ignore
+import Chatbot, {type Message} from 'my-chatbot-lib-0';
+import 'my-chatbot-lib-0/style.css';
 import React, { useState } from 'react';
 
 export default function MobileLogin() {
@@ -8,6 +11,17 @@ export default function MobileLogin() {
     e.preventDefault();
     // 로그인 처리 로직
     alert(`이메일: ${email}\n비밀번호: ${password}`);
+  };
+
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  const handleSend = (text: string) => {
+    setMessages((prev) => [...prev, { from: 'user', text }]);
+
+    // 가짜 응답 예시
+    setTimeout(() => {
+      setMessages((prev) => [...prev, { from: 'bot', text: `당신은 "${text}"라고 입력했어요.` }]);
+    }, 500);
   };
 
   return (
@@ -29,6 +43,7 @@ export default function MobileLogin() {
         boxSizing: 'border-box',
       }}
     >
+      <Chatbot messages={messages} onSend={handleSend}/>
       <h2
         style={{
           fontSize: '1.75rem', // 28px
